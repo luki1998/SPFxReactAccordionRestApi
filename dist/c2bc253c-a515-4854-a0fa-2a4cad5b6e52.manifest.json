@@ -22,7 +22,8 @@
       },
       "officeFabricIconFontName": "Page",
       "properties": {
-        "description": "accordion"
+        "description": "accordion",
+        "listName": ""
       }
     }
   ],

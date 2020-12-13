@@ -8,6 +8,7 @@ export interface IAccordionWebPartProps {
 export default class AccordionWebPart extends BaseClientSideWebPart<IAccordionWebPartProps> {
     private _listItems;
     render(): void;
+    protected onInit(): Promise<void>;
     private _onGetListItems;
     private _onAddListItem;
     private _onUpdateListItem;

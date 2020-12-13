@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Elements xmlns="http://schemas.microsoft.com/sharepoint/">
+
+    <Field ID="{33ae3cb2-f2e3-4f99-9240-daea8dcfc68f}"
+            Name="SPFxTitle"
+            DisplayName="Title"
+            Type="Text"
+            Required="FALSE"
+            Group="SPFx Columns" />
+
+    <Field ID="{83d097af-18b1-4dd2-a797-2d0618216c99}"
+            Name="SPFxContent"
+            DisplayName="Content"
+            Type="Text"
+            Required="FALSE"
+            Group="SPFx Columns">
+    </Field>
+
+    <Field ID="{8850732a-ccaa-435b-bae4-fb784810216e}"
+            Name="SPFxSortOrder"
+            DisplayName="SortOrder"
+            Type="Number"
+            Required="FALSE"
+            Group="SPFx Columns">
+    </Field>
+                
+    <ContentType ID="0x010042D0C1C200A14B6887742B6344675C8B"
+            Name="textField"
+            Group="SPFx Content Types"
+            Description="Sample content types from web part solution">
+        <FieldRefs>
+            <FieldRef ID="{33ae3cb2-f2e3-4f99-9240-daea8dcfc68f}" />
+            <FieldRef ID="{83d097af-18b1-4dd2-a797-2d0618216c99}" />
+            <FieldRef ID="{8850732a-ccaa-435b-bae4-fb784810216e}" />
+        </FieldRefs>
+    </ContentType>
+
+    <ListInstance
+            CustomSchema="schema.xml"
+            FeatureId="00bfea71-de22-43b2-a848-c05709900100"
+            Title="AccordionList"
+            Description="AccordionList"
+            TemplateType="100"
+            Url="Lists/SPFxList">
+    </ListInstance>
+
+</Elements>

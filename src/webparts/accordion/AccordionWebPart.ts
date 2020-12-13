@@ -13,6 +13,7 @@ import { IAccordionProps } from './components/IAccordionProps';
 
 import { SPHttpClient, SPHttpClientResponse } from '@microsoft/sp-http';
 import { IListItem } from '../../models';
+import { sp } from "@pnp/sp/presets/all";
 
 
 
@@ -25,7 +26,7 @@ export interface IAccordionWebPartProps {
 export default class AccordionWebPart extends BaseClientSideWebPart<IAccordionWebPartProps> {
 
   private _listItems: IListItem[] = [];
-
+  
   public render(): void {
     const element: React.ReactElement<IAccordionProps> = React.createElement(
       Accordion,
@@ -44,8 +45,17 @@ export default class AccordionWebPart extends BaseClientSideWebPart<IAccordionWe
     if (this.properties.listName == "") {
       this.properties.listName = this.context.pageContext.web.title;
     } 
+    
 
     ReactDom.render(element, this.domElement);
+  }
+
+    protected onInit(): Promise<void> {  
+      return super.onInit().then(_ => {  
+        sp.setup({  
+            spfxContext: this.context  
+        });  
+      });  
   }
 
   private _onGetListItems = (): void => {
@@ -56,8 +66,8 @@ export default class AccordionWebPart extends BaseClientSideWebPart<IAccordionWe
       });
   }
 
-  private _onAddListItem = (): void => {
-    this._addListItem()
+  private _onAddListItem = (title: string, content: any): any => {
+    this._addListItem(title, content)
       .then(() => {
         this._getListItems()
           .then(response => {
@@ -78,8 +88,8 @@ export default class AccordionWebPart extends BaseClientSideWebPart<IAccordionWe
       });
   }
   
-  private _onDeleteListItem = (): void => {
-    this._deleteListItem()
+  private _onDeleteListItem = (id: number): any => {
+    this._deleteListItem(id)
       .then(() => {
         this._getListItems()
           .then(response => {
@@ -93,7 +103,7 @@ export default class AccordionWebPart extends BaseClientSideWebPart<IAccordionWe
 
   private _getListItems(): Promise<IListItem[]> {
     return this.context.spHttpClient.get(
-      this.context.pageContext.web.absoluteUrl + `/_api/web/lists/getbytitle('AccordionList')/items?$select=Id,Title`, 
+      this.context.pageContext.web.absoluteUrl + `/_api/web/lists/getbytitle('AccordionList')/items?$select=Id,Title,SPFxContent,SPFxSortOrder`, 
       SPHttpClient.configurations.v1)
       .then(response => {
         return response.json();
@@ -115,12 +125,14 @@ export default class AccordionWebPart extends BaseClientSideWebPart<IAccordionWe
       }) as Promise<string>;
   }
   
-  private _addListItem(): Promise<SPHttpClientResponse> {
+  private _addListItem(title: string, content: any): Promise<SPHttpClientResponse> {
     return this._getItemEntityType()
       .then(spEntityType => {
         const request: any = {};
         request.body = JSON.stringify({
-          Title: new Date().toUTCString(),
+          Title: title,
+          SPFxContent: content,
+          SPFxSortOrder: 1,
           '@odata.type': spEntityType
         });
   
@@ -135,7 +147,7 @@ export default class AccordionWebPart extends BaseClientSideWebPart<IAccordionWe
   private _updateListItem(): Promise<SPHttpClientResponse> {
     // get the first item
     return this.context.spHttpClient.get(
-        this.context.pageContext.web.absoluteUrl + `/_api/web/lists/getbytitle('AccordionList')/items?$select=Id,Title&$filter=Title eq 'United States'`, 
+        this.context.pageContext.web.absoluteUrl + `/_api/web/lists/getbytitle('AccordionList')/items?$select=Id,Title,SPFxContent,SPFxSortOrder&$orderby=ID desc&$top=1'`, 
         SPHttpClient.configurations.v1)
       .then(response => {
         return response.json();
@@ -161,10 +173,10 @@ export default class AccordionWebPart extends BaseClientSideWebPart<IAccordionWe
       });
   }
 
-  private _deleteListItem(): Promise<SPHttpClientResponse> {
+  private _deleteListItem(id:number): Promise<SPHttpClientResponse> {
     // get the last item
     return this.context.spHttpClient.get(
-        this.context.pageContext.web.absoluteUrl + `/_api/web/lists/getbytitle('AccordionList')/items?$select=Id,Title&$orderby=ID desc&$top=1`, 
+        this.context.pageContext.web.absoluteUrl + `/_api/web/lists/getbytitle('AccordionList')/items?$select=Id,Title&$filter=Id eq ${id}`, 
         SPHttpClient.configurations.v1)
       .then(response => {
         return response.json();
